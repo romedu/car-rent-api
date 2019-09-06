@@ -17,7 +17,7 @@ router.post("/login", (req, res, next) => {
 				passwordValidity = await bcrypt.compare(password, hashedPassword);
 
 			if (!passwordValidity) throw new Error("Invalid Username/Password");
-			return res.status(200).JSON({ token: getValidJwt(userId) });
+			return res.status(200).JSON({ token: await getValidJwt(userId) });
 		} catch (error) {
 			next(error);
 		}
@@ -25,3 +25,5 @@ router.post("/login", (req, res, next) => {
 });
 
 const getValidJwt = async userId => await jwt.sign({ userId }, SECRET);
+
+module.exports = router;
