@@ -7,12 +7,14 @@ const express = require("express"),
 	{ PORT } = process.env,
 	vehiclesRoutes = require("./routes/vehicles"),
 	rentsRoutes = require("./routes/rents"),
+	inspectionsRoutes = require("./routes/inspections"),
 	authRoutes = require("./routes/auth");
 
 app.use(cors("*"));
 app.use(morgan("tiny"));
 app.use(express.json());
 
+app.use("/api/inspections", inspectionsRoutes);
 app.use("/api/vehicles", vehiclesRoutes);
 app.use("/api/rents", rentsRoutes);
 app.use("/api/auth", authRoutes);
