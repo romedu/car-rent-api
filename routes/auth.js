@@ -1,4 +1,4 @@
-const router = require("express").Router,
+const router = require("express").Router(),
 	bcrypt = require("bcryptjs"),
 	jwt = require("jsonwebtoken"),
 	dbPool = require("../model"),
