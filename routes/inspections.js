@@ -1,9 +1,11 @@
 const router = require("express").Router(),
-	inspectionsHelpers = require("../helpers/inspections");
+	inspectionsHelpers = require("../helpers/inspections"),
+	{ checkIfToken } = require("../middlewares");
 
 router.get("/", inspectionsHelpers.findAll);
 
-router.post("/", inspectionsHelpers.create);
+// Only authenticated users can proceed
+router.post("/", checkIfToken, inspectionsHelpers.create);
 
 router.get("/:id", inspectionsHelpers.findOne);
 

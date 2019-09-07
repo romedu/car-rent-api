@@ -31,10 +31,11 @@ exports.findAll = (req, res, next) => {
 };
 
 exports.create = (req, res, next) => {
-	const { vehicleId, clientId, employeeId, zest, fuelAmount } = req.body,
+	const { vehicleId, employeeId, zest, fuelAmount } = req.body,
+		{ currentUserId } = req.locals,
 		query = `
             INSERT INTO inspection(vehicle_id, client_id, employee_id, zest, fuel_amount)
-            VALUES (${vehicleId}, ${clientId}, ${employeeId}, ${zest}, ${fuelAmount});
+            VALUES (${vehicleId}, ${currentUserId}, ${employeeId}, ${zest}, ${fuelAmount});
          `;
 
 	dbPool.query(query, (error, result) => {

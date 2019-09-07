@@ -31,7 +31,8 @@ exports.findAll = (req, res, next) => {
 };
 
 exports.create = (req, res, next) => {
-	const { vehicleId, rentDays, commentary, employeeId, clientId } = req.body,
+	const { vehicleId, rentDays, commentary, employeeId } = req.body,
+		{ currentUserId } = req.locals,
 		// The vehicle's rent_price is used to calculate the rent fee
 		vehicleQuery = `(SELECT rent_price FROM vehicle WHERE vehicle.id = ${vehicleId})`;
 	createRentQuery = `
@@ -41,7 +42,7 @@ exports.create = (req, res, next) => {
 		                  ${commentary},
                         ${rentDays * vehicleQuery},
                         ${employeeId},
-                        ${clientId},
+                        ${currentUserId},
                         ${vehicleId}
                       );
             `;
