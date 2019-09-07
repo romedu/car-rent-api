@@ -26,41 +26,43 @@ router.get("/", (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		return res
-			.status(200)
-			.json({ rents: JSON.parse(JSON.stringify(results)) });
+		const rents = JSON.parse(JSON.stringify(results));
+		return res.status(200).json({ rents });
 	});
 });
 
 router.post("/", (req, res, next) => {
-	const { vehicleId } = req.body,
-		vehicleQuery = `
-            SELECT rent_price FROM vehicle
-            WHERE vehicle.id = ${vehicleId};
-         `;
-
-	// The vehicle's rentPrice is used to calculate the rent fee
-	dbPool.query(vehicleQuery, (error, vehicleResult) => {
-		if (error) return next(error);
-
-		const { rentDays, commentary, employeeId, clientId } = req.body,
-			{ rent_price: rentPrice } = JSON.parse(
-				JSON.stringify(vehicleResult)
-			)[0],
-			createRentQuery = `
+	const { vehicleId, rentDays, commentary, employeeId, clientId } = req.body,
+		// The vehicle's rent_price is used to calculate the rent fee
+		vehicleQuery = `(SELECT rent_price FROM vehicle WHERE vehicle.id = ${vehicleId})`;
+	createRentQuery = `
                INSERT INTO rent(rent_days, commentary, fee, employee_id, client_id, vehicle_id)
-               VALUES (${(rentDays,
-					commentary,
-					rent_days * rentPrice,
-					employeeId,
-					clientId,
-					vehicleId)});
+               VALUES (
+                        ${rentDays},
+		                  ${commentary},
+                        ${rentDays * vehicleQuery},
+                        ${employeeId},
+                        ${clientId},
+                        ${vehicleId}
+                      );
             `;
 
-		// TODO: MAKE A TRIGGER THAT BUMPS THE VEHICLE RENTS AND MAKES IT UNAVAILABLE AFTER IT IS RENTED
-		dbPool.query(createRentQuery, error => {
+	// Bump the rented vehicles rent value and make it unavaible
+	dbPool.query(createRentQuery, (error, rentResult) => {
+		if (error) return next(error);
+
+		const vehicleRentsQuery = `(SELECT rents FROM vehicle WHERE id = ${vehicleId})`,
+			vehicleUpdateQuery = `
+            UPDATE vehicle 
+            SET rents = ${vehicleRentsQuery} + 1,
+                available = false
+            WEHRE id = ${vehicleId}
+         `;
+
+		dbPool.query(vehicleUpdateQuery, error => {
 			if (error) return next(error);
-			return res.status(201).json({ message: "Rent created successfully" });
+			const { insertId: rentId } = JSON.parse(JSON.stringify(rentResult));
+			return res.status(201).json({ rentId });
 		});
 	});
 });
@@ -87,21 +89,29 @@ router.get("/:id", (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		return res
-			.status(200)
-			.json({ rent: JSON.parse(JSON.stringify(results))[0] });
+		const rent = JSON.parse(JSON.stringify(results))[0];
+		return res.status(200).json({ rent });
 	});
 });
 
 router.patch("/:id", (req, res, next) => {
 	const { id: rentId } = req.params,
 		{ returnedAt } = req.body,
-		query = `UPDATE rents set returned_at = ${returnedAt} where id = ${rentId};`;
+		query = `UPDATE rent set returned_at = ${returnedAt} where id = ${rentId};`;
 
-	// TODO: MAKE A TRIGGER THAT MAKES THE VEHICLE AVAILABLE AFTER IT IS RETURNED
+	// Make the vehicle avaible after it was returned
 	dbPool.query(query, error => {
 		if (error) return next(error);
-		return res.status(200).json({ message: "Rent updated successfully" });
+		const vehicleIdQuery = `(SELECT vehicle_id FROM rent WHERE id = ${rentId})`,
+			vehicleUpdateQuery = `
+               UPDATE vehicle SET available = true
+               WHERE id = ${vehicleIdQuery};
+            `;
+
+		dbPool.query(vehicleUpdateQuery, error => {
+			if (error) return next(error);
+			return res.status(200).json({ message: "Rent updated successfully" });
+		});
 	});
 });
 
