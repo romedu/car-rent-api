@@ -18,4 +18,4 @@ exports.checkIfOwner = (req, res, next) => {
 	});
 };
 
-export default exports;
+module.exports = exports;
