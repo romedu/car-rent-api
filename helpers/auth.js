@@ -35,7 +35,7 @@ exports.register = async (req, res, next) => {
 			} = req.body,
 			passwordHash = await bcrypt.hash(password, 8),
 			query = `
-            INSERT INTO client(username, password, name, nationalId, cardNo, isJuridic)
+            INSERT INTO client(username, password, name, national_id, card_no, is_juridic)
             VALUES (${username}, ${passwordHash}, ${name}, ${nationalId}, ${cardNo}, ${isJuridic});
          `;
 
