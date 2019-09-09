@@ -96,8 +96,8 @@ exports.findOne = (req, res, next) => {
 
 exports.returnRent = (req, res, next) => {
 	const { id: rentId } = req.params,
-		{ returnedAt } = req.body,
-		query = `UPDATE rent set returned_at = ${returnedAt} where id = ${rentId};`;
+		currentDate = new Date(),
+		query = `UPDATE rent set returned_at = ${currentDate} where id = ${rentId};`;
 
 	// Make the vehicle avaible after it was returned
 	dbPool.query(query, error => {

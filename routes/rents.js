@@ -10,7 +10,8 @@ router.post("/", checkIfToken, rentsHelpers.create);
 
 router.get("/:id", rentsHelpers.findOne);
 
-//MUST BE A CLIENT AND THE OWNER OD THE RENT
+// Returns the rented vehicle
+// Only the owner of the rent can proceed
 router.patch("/:id", checkIfToken, checkIfOwner, rentsHelpers.returnRent);
 
 module.exports = router;
