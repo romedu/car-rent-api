@@ -30,34 +30,33 @@ exports.findAll = (req, res, next) => {
 	});
 };
 
+// Creates a rent and bump the current vehicle's rent property
 exports.create = (req, res, next) => {
 	const { vehicleId, rentDays, commentary, employeeId } = req.body,
-		{ currentUserId } = req.locals,
+		{ currentUserId, currentVehicle } = req.locals,
 		// The vehicle's rent_price is used to calculate the rent fee
-		vehicleQuery = `(SELECT rent_price FROM vehicle WHERE vehicle.id = ${vehicleId})`;
-	createRentQuery = `
-               INSERT INTO rent(rent_days, commentary, fee, employee_id, client_id, vehicle_id)
-               VALUES (
-                        ${rentDays},
-		                  ${commentary},
-                        ${rentDays * vehicleQuery},
-                        ${employeeId},
-                        ${currentUserId},
-                        ${vehicleId}
-                      );
-            `;
+		createRentQuery = `
+         INSERT INTO rent(rent_days, commentary, fee, employee_id, client_id, vehicle_id)
+         VALUES (
+                  ${rentDays},
+                  ${commentary},
+                  ${rentDays * currentVehicle.rentPrice},
+                  ${employeeId},
+                  ${currentUserId},
+                  ${vehicleId}
+               );
+      `;
 
 	// Bump the rented vehicles rent value and make it unavaible
 	dbPool.query(createRentQuery, (error, rentResult) => {
 		if (error) return next(error);
 
-		const vehicleRentsQuery = `(SELECT rents FROM vehicle WHERE id = ${vehicleId})`,
-			vehicleUpdateQuery = `
-            UPDATE vehicle 
-            SET rents = ${vehicleRentsQuery} + 1,
-                available = false
-            WEHRE id = ${vehicleId}
-         `;
+		const vehicleUpdateQuery = `
+               UPDATE vehicle 
+               SET rents = ${currentVehicle.rents} + 1,
+                  available = false
+               WEHRE id = ${vehicleId}
+            `;
 
 		dbPool.query(vehicleUpdateQuery, error => {
 			if (error) return next(error);
@@ -94,6 +93,7 @@ exports.findOne = (req, res, next) => {
 	});
 };
 
+// Sets the current date as the returned_at date for the rent entity and makes the rented vehicle available
 exports.returnRent = (req, res, next) => {
 	const { id: rentId } = req.params,
 		currentDate = new Date(),
@@ -102,10 +102,10 @@ exports.returnRent = (req, res, next) => {
 	// Make the vehicle avaible after it was returned
 	dbPool.query(query, error => {
 		if (error) return next(error);
-		const vehicleIdQuery = `(SELECT vehicle_id FROM rent WHERE id = ${rentId})`,
+		const { id: rentedVehicleId } = req.locals.currentVehicle,
 			vehicleUpdateQuery = `
                UPDATE vehicle SET available = true
-               WHERE id = ${vehicleIdQuery};
+               WHERE id = ${rentedVehicleId};
             `;
 
 		dbPool.query(vehicleUpdateQuery, error => {
