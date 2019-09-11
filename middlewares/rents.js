@@ -26,6 +26,11 @@ exports.getCurrentVehicle = (req, res, next) => {
 	dbPool.query(vehicleQuery, (error, result) => {
 		if (error) return next(error);
 		const vehicleData = JSON.parse(JSON.stringify(result))[0];
+		// If no vehicle was found with the passed id send an error
+		if (!vehicleData) {
+			error = new Error("Vehicle not found");
+			return next(error);
+		}
 		req.locals.currentVehicle = { ...vehicleData };
 		next();
 	});

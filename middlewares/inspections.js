@@ -11,6 +11,11 @@ exports.getCurrentRent = (req, res, next) => {
 	dbPool.query(currentRentQuery, (error, rentResult) => {
 		if (error) return next(error);
 		const rentData = JSON.parse(JSON.stringify(rentResult))[0];
+		// If no rent was found with the passed id send an error
+		if (!rentData) {
+			error = new Error("Rent not found");
+			return next(error);
+		}
 		req.locals.currentRent = { ...rentData };
 		next();
 	});
