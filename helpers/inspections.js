@@ -10,8 +10,10 @@ exports.findAll = (req, res, next) => {
 		query = `
                SELECT inspection.id AS id, inspection.created_at AS created_at, vehicle.built_year AS built_year, 
                       vehicle_image.front_image AS front_image, model.description AS model, make.description AS make FROM inspection
+               INNER JOIN rent
+               ON inspection.rent_id = rent.id
                INNER JOIN vehicle
-               ON inspection.vehicle_id = vehicle.id
+               ON rent.vehicle_id = vehicle.id
                INNER JOIN vehicle_image
                ON vehicle_image.vehicle_id = vehicle.id
                INNER JOIN make
@@ -31,11 +33,11 @@ exports.findAll = (req, res, next) => {
 };
 
 exports.create = (req, res, next) => {
-	const { vehicleId, employeeId, zest, fuelAmount } = req.body,
+	const { rentId, employeeId, zest, fuelAmount } = req.body,
 		{ currentUserId } = req.locals,
 		query = `
-            INSERT INTO inspection(vehicle_id, client_id, employee_id, zest, fuel_amount)
-            VALUES (${vehicleId}, ${currentUserId}, ${employeeId}, ${zest}, ${fuelAmount});
+            INSERT INTO inspection(rent_id, client_id, employee_id, zest, fuel_amount)
+            VALUES (${rentId}, ${currentUserId}, ${employeeId}, ${zest}, ${fuelAmount});
          `;
 
 	dbPool.query(query, (error, result) => {
@@ -50,8 +52,10 @@ exports.findOne = (req, res, next) => {
 		query = `
          SELECT inspection.*, employee.name AS employee_name, vehicle.built_year AS built_year, 
          vehicle_image.front_image AS front_image, model.description AS model, make.description AS make FROM inspection
+         INNER JOIN rent
+         ON inspection.rent_id = rent.id
          INNER JOIN vehicle
-         ON inspection.vehicle_id = vehicle.id
+         ON rent.vehicle_id = vehicle.id
          INNER JOIN vehicle_image
          ON vehicle_image.vehicle_id = vehicle.id
          INNER JOIN make
