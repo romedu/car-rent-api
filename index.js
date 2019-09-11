@@ -19,6 +19,15 @@ app.use("/api/vehicles", vehiclesRoutes);
 app.use("/api/rents", rentsRoutes);
 app.use("/api/auth", authRoutes);
 
+app.use("*", (req, res) => {
+	return res.status(404).json({ error: "Not Found" });
+});
+
+app.use((error, req, res, next) => {
+	console.log("Fatal Error: ", error.message);
+	return res.json({ error: error.message });
+});
+
 app.listen(PORT, () => {
 	console.log("Server's running in port:", PORT);
 });
