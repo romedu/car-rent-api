@@ -64,7 +64,7 @@ exports.findOne = (req, res, next) => {
          ON model.id = vehicle.model_id
          INNER JOIN employee
          ON employee.id = inspection.employee_id
-         WHERE inspection.id = ${inspectionId};
+         WHERE inspection.id = "${inspectionId}";
       `;
 
 	dbPool.query(query, (error, results) => {

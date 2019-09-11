@@ -55,7 +55,7 @@ exports.create = (req, res, next) => {
                UPDATE vehicle 
                SET rents = ${currentVehicle.rents} + 1,
                   available = false
-               WEHRE id = ${vehicleId}
+               WEHRE id = "${vehicleId}"
             `;
 
 		dbPool.query(vehicleUpdateQuery, error => {
@@ -83,7 +83,7 @@ exports.findOne = (req, res, next) => {
          ON client.id = rent.client_id
          INNER JOIN person
          ON person.id = client.person_id
-         WHERE rent.id = ${rentId};
+         WHERE rent.id = "${rentId}";
       `;
 
 	dbPool.query(query, (error, results) => {
@@ -105,7 +105,7 @@ exports.returnRent = (req, res, next) => {
 		const { id: rentedVehicleId } = req.locals.currentVehicle,
 			vehicleUpdateQuery = `
                UPDATE vehicle SET available = true
-               WHERE id = ${rentedVehicleId};
+               WHERE id = "${rentedVehicleId}";
             `;
 
 		dbPool.query(vehicleUpdateQuery, error => {

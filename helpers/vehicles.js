@@ -41,7 +41,7 @@ exports.findOne = (req, res, next) => {
 		ON make.id = model.make_id
       INNER JOIN body_style
       ON body_style.id = vehicle.body_style_id
-		WHERE vehicle.id = ${req.params.id};
+		WHERE vehicle.id = "${req.params.id}";
 	`;
 
 	dbPool.query(query, (error, results) => {

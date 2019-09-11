@@ -5,7 +5,7 @@ exports.getCurrentRent = (req, res, next) => {
 	const { rentId } = req.body,
 		currentRentQuery = `
             SELECT client_id AS renterId, returned_at AS returnedAt
-            FROM rent WHERE id = ${rentId};
+            FROM rent WHERE id = "${rentId}";
          `;
 
 	dbPool.query(currentRentQuery, (error, rentResult) => {
@@ -40,7 +40,7 @@ exports.checkIfRented = (req, res, next) => {
 
 exports.checkIfNotInspected = (req, res, next) => {
 	const { rentId } = req.body,
-		rentCountQuery = `SELECT COUNT(*) as rentCount FROM inspection WHERE rent_id = ${rentId};`;
+		rentCountQuery = `SELECT COUNT(*) as rentCount FROM inspection WHERE rent_id = "${rentId}";`;
 
 	dbPool.query(rentCountQuery, (error, rentCountResult) => {
 		if (error) return next(error);

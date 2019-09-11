@@ -3,7 +3,7 @@ const dbPool = require("../model");
 // Checks if the currentUser is the one who actually rented the car
 exports.checkIfOwner = (req, res, next) => {
 	const { id: rentId } = req.params,
-		rentQuery = `SELECT client_id AS clientId FROM rent WHERE id = ${rentId}`;
+		rentQuery = `SELECT client_id AS clientId FROM rent WHERE id = "${rentId}"`;
 
 	dbPool.query(rentQuery, (error, rentResult) => {
 		if (error) return next(error);
@@ -21,7 +21,7 @@ exports.checkIfOwner = (req, res, next) => {
 // Finds the current vehicle based on the body's vehicle id and pass its data in the req.locals object
 exports.getCurrentVehicle = (req, res, next) => {
 	const { vehicleId } = req.body,
-		vehicleQuery = `(SELECT id, rent_price AS rentPrice, available, rents FROM vehicle WHERE vehicle.id = ${vehicleId})`;
+		vehicleQuery = `(SELECT id, rent_price AS rentPrice, available, rents FROM vehicle WHERE vehicle.id = "${vehicleId}")`;
 
 	dbPool.query(vehicleQuery, (error, result) => {
 		if (error) return next(error);
@@ -39,7 +39,7 @@ exports.getRentedVehicle = (req, res, next) => {
             FROM rent
             INNER JOIN vehicle
             ON vehicle.id = rent.vehicle_id
-            WHERE rent.id = ${rentId}
+            WHERE rent.id = "${rentId}"
          `;
 
 	dbPool.query(rentVehicleQuery, (error, vehicleResult) => {
@@ -73,7 +73,7 @@ exports.checkVehicleUnavailability = (req, res, next) => {
 // Checks if the rented vehicle was inspected
 exports.checkIfInspected = (req, res, next) => {
 	const { id: rentId } = req.params,
-		inspectionQuery = `SELECT COUNT(*) as rentCount FROM inspection WHERE rent_id = ${rentId}`;
+		inspectionQuery = `SELECT COUNT(*) as rentCount FROM inspection WHERE rent_id = "${rentId}"`;
 
 	dbPool.query(inspectionQuery, (error, countResult) => {
 		if (error) return next(error);
