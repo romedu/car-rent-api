@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs"),
 
 exports.login = (req, res, next) => {
 	const { username, password } = req.body,
-		userQuery = `SELECT id, password FROM client WHERE username=${username}`;
+		userQuery = `SELECT id, password FROM client WHERE username="${username}"`;
 
 	dbPool.query(userQuery, async (error, results) => {
 		try {
@@ -16,7 +16,7 @@ exports.login = (req, res, next) => {
 				passwordValidity = await bcrypt.compare(password, hashedPassword);
 
 			if (!passwordValidity) throw new Error("Invalid Username/Password");
-			return res.status(200).JSON({ token: await getValidJwt(userId) });
+			return res.status(200).json({ token: await getValidJwt(userId) });
 		} catch (error) {
 			next(error);
 		}
@@ -36,11 +36,11 @@ exports.register = async (req, res, next) => {
 			passwordHash = await bcrypt.hash(password, 8),
 			query = `
             INSERT INTO client(username, password, name, national_id, card_no, is_juridic)
-            VALUES (${username}, ${passwordHash}, ${name}, ${nationalId}, ${cardNo}, ${isJuridic});
+            VALUES ("${username}", "${passwordHash}", "${name}", "${nationalId}", "${cardNo}", ${isJuridic});
          `;
 
 		dbPool.query(query, async (error, result) => {
-			if (error) throw error;
+			if (error) return next(error);
 			const { insertId: userId } = JSON.parse(JSON.stringify(result));
 			return res.status(201).json({ token: await getValidJwt(userId) });
 		});
