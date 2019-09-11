@@ -23,9 +23,8 @@ exports.findAll = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		return res
-			.status(200)
-			.json({ vehicles: JSON.parse(JSON.stringify(results)) });
+		const vehicles = JSON.parse(JSON.stringify(results));
+		return res.status(200).json({ vehicles });
 	});
 };
 
@@ -46,7 +45,8 @@ exports.findOne = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		res.status(200).json({ vehicle: JSON.parse(JSON.stringify(results))[0] });
+		const vehicle = JSON.parse(JSON.stringify(results))[0];
+		res.status(200).json({ vehicle });
 	});
 };
 
