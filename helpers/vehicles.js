@@ -8,8 +8,9 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-				SELECT vehicle.*, vehicle_image.front_image AS front_image, model.description AS model, 
-						  make.description AS make FROM vehicle
+				SELECT vehicle.*, vehicle_image.front_image AS frontImage, model.description AS model, 
+                    make.description AS make 
+            FROM vehicle
             INNER JOIN vehicle_image
 				ON vehicle_image.vehicle_id = vehicle.id
 				INNER JOIN model
@@ -30,8 +31,9 @@ exports.findAll = (req, res, next) => {
 
 exports.findOne = (req, res, next) => {
 	const query = `
-		SELECT vehicle.*, vehicle_image.front_image AS front_image, model.description AS model, 
-				 make.description AS make, body_style.description AS bodyStyle FROM vehicle
+		SELECT vehicle.*, vehicle_image.front_image AS frontImage, model.description AS model, 
+             make.description AS make, body_style.description AS bodyStyle 
+      FROM vehicle
 		INNER JOIN vehicle_image
 		ON vehicle_image.vehicle_id = vehicle.id
 		INNER JOIN model

@@ -8,16 +8,17 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-         SELECT rent.*, vehicle.built_year AS built_year, vehicle_image.front_image AS front_image, 
-                  model.description AS model, make.description AS make FROM rent
+         SELECT rent.*, vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, 
+                  model.description AS model, make.description AS make 
+         FROM rent
          INNER JOIN vehicle
          ON rent.vehicle_id = vehicle.id
          INNER JOIN vehicle_image
          ON vehicle_image.vehicle_id = vehicle.id
-         INNER JOIN make
-         ON make.id = vehicle.make_id
          INNER JOIN model
          ON model.id = vehicle.model_id
+         INNER JOIN make
+         ON make.id = model.make_id
          ${whereClause}
          ORDER BY vehicle.rents
          LIMIT ${page * 10 - 10}, ${page * 10};
@@ -69,20 +70,19 @@ exports.create = (req, res, next) => {
 exports.findOne = (req, res, next) => {
 	const { id: rentId } = req.params,
 		query = `
-         SELECT rent.*, vehicle.built_year AS built_year, vehicle_image.front_image AS front_image, 
-               model.description AS model, make.description AS make, person.name AS client_name FROM rent
+         SELECT rent.*, vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, 
+               model.description AS model, make.description AS make, client.name AS clientName 
+         FROM rent
          INNER JOIN vehicle
          ON rent.vehicle_id = vehicle.id
          INNER JOIN vehicle_image
          ON vehicle_image.vehicle_id = vehicle.id
-         INNER JOIN make
-         ON make.id = vehicle.make_id
          INNER JOIN model
          ON model.id = vehicle.model_id
+         INNER JOIN make
+         ON make.id = model.make_id
          INNER JOIN client
          ON client.id = rent.client_id
-         INNER JOIN person
-         ON person.id = client.person_id
          WHERE rent.id = "${rentId}";
       `;
 

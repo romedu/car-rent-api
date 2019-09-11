@@ -8,18 +8,19 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-               SELECT inspection.id AS id, inspection.created_at AS created_at, vehicle.built_year AS built_year, 
-                      vehicle_image.front_image AS front_image, model.description AS model, make.description AS make FROM inspection
+               SELECT inspection.id AS id, inspection.created_at AS createdAt, vehicle.built_year AS builtYear, 
+                      vehicle_image.front_image AS frontImage, model.description AS model, make.description AS make 
+               FROM inspection
                INNER JOIN rent
                ON inspection.rent_id = rent.id
                INNER JOIN vehicle
                ON rent.vehicle_id = vehicle.id
                INNER JOIN vehicle_image
                ON vehicle_image.vehicle_id = vehicle.id
-               INNER JOIN make
-               ON make.id = vehicle.make_id
                INNER JOIN model
                ON model.id = vehicle.model_id
+               INNER JOIN make
+               ON make.id = model.make_id
                ${whereClause}
                ORDER BY vehicle.rents
                LIMIT ${page * 10 - 10}, ${page * 10};
@@ -50,18 +51,19 @@ exports.create = (req, res, next) => {
 exports.findOne = (req, res, next) => {
 	const { id: inspectionId } = req.params,
 		query = `
-         SELECT inspection.*, employee.name AS employee_name, vehicle.built_year AS built_year, 
-         vehicle_image.front_image AS front_image, model.description AS model, make.description AS make FROM inspection
+         SELECT inspection.*, employee.name AS employeeName, vehicle.built_year AS builtYear, 
+                vehicle_image.front_image AS frontImage, model.description AS model, make.description AS make 
+         FROM inspection
          INNER JOIN rent
          ON inspection.rent_id = rent.id
          INNER JOIN vehicle
          ON rent.vehicle_id = vehicle.id
          INNER JOIN vehicle_image
          ON vehicle_image.vehicle_id = vehicle.id
-         INNER JOIN make
-         ON make.id = vehicle.make_id
          INNER JOIN model
          ON model.id = vehicle.model_id
+         INNER JOIN make
+         ON make.id = model.make_id
          INNER JOIN employee
          ON employee.id = inspection.employee_id
          WHERE inspection.id = "${inspectionId}";
