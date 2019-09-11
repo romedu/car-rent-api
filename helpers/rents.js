@@ -39,7 +39,7 @@ exports.create = (req, res, next) => {
          INSERT INTO rent(rent_days, commentary, fee, employee_id, client_id, vehicle_id)
          VALUES (
                   ${rentDays},
-                  ${commentary},
+                  "${commentary}",
                   ${rentDays * currentVehicle.rentPrice},
                   ${employeeId},
                   ${currentUserId},
