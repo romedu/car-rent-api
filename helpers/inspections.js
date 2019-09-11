@@ -70,6 +70,11 @@ exports.findOne = (req, res, next) => {
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
 		const inspection = JSON.parse(JSON.stringify(results))[0];
+		// If no inspection matches the id passed in the params, throw a not found error
+		if (!inspection) {
+			error = new Error("Not Found");
+			return next(error);
+		}
 		return res.status(200).json({ inspection });
 	});
 };

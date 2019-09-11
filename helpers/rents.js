@@ -89,6 +89,11 @@ exports.findOne = (req, res, next) => {
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
 		const rent = JSON.parse(JSON.stringify(results))[0];
+		// If no rent matches the id passed in the params, throw a not found error
+		if (!rent) {
+			error = new Error("Not Found");
+			return next(error);
+		}
 		return res.status(200).json({ rent });
 	});
 };
