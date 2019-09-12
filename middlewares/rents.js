@@ -8,9 +8,15 @@ exports.checkIfOwner = (req, res, next) => {
 	dbPool.query(rentQuery, (error, rentResult) => {
 		if (error) return next(error);
 		const { currentUserId } = req.locals,
-			{ clientId } = JSON.parse(JSON.stringify(rentResult))[0];
+			rentData = JSON.parse(JSON.stringify(rentResult))[0];
 
-		if (clientId === currentUserId) next();
+		// If no rent were found throw a not found error
+		if (!rentData) {
+			error = new Error("Not found");
+			return next(error);
+		}
+
+		if (rentData.clientId === currentUserId) next();
 		else {
 			error = new Error("Unauthorized");
 			return next(error);
@@ -82,7 +88,7 @@ exports.checkIfInspected = (req, res, next) => {
 
 	dbPool.query(inspectionQuery, (error, countResult) => {
 		if (error) return next(error);
-		const { rentCount } = JSON.parse(JSON.stringify(countResult));
+		const { rentCount } = JSON.parse(JSON.stringify(countResult))[0];
 		if (rentCount) return next();
 		else {
 			error = new Error("Vehicle must be inspected first");

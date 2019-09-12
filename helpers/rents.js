@@ -33,7 +33,7 @@ exports.findAll = (req, res, next) => {
 
 // Creates a rent and bump the current vehicle's rent property
 exports.create = (req, res, next) => {
-	const { vehicleId, rentDays, commentary, employeeId } = req.body,
+	const { vehicleId, rentDays, commentary = "", employeeId } = req.body,
 		{ currentUserId, currentVehicle } = req.locals,
 		// The vehicle's rent_price is used to calculate the rent fee
 		createRentQuery = `
@@ -56,7 +56,7 @@ exports.create = (req, res, next) => {
                UPDATE vehicle 
                SET rents = ${currentVehicle.rents} + 1,
                   available = false
-               WEHRE id = "${vehicleId}"
+               WHERE id = "${vehicleId}";
             `;
 
 		dbPool.query(vehicleUpdateQuery, error => {
@@ -101,8 +101,12 @@ exports.findOne = (req, res, next) => {
 // Sets the current date as the returned_at date for the rent entity and makes the rented vehicle available
 exports.returnRent = (req, res, next) => {
 	const { id: rentId } = req.params,
-		currentDate = new Date(),
-		query = `UPDATE rent set returned_at = ${currentDate} where id = ${rentId};`;
+		// The currentDate value gets converted to the equivalent of a timestamp in mysql, e.g. "2017-06-29 17:54:04"
+		currentDate = new Date()
+			.toISOString()
+			.slice(0, 19)
+			.replace("T", " "),
+		query = `UPDATE rent set returned_at = "${currentDate}" where id = "${rentId}";`;
 
 	// Make the vehicle avaible after it was returned
 	dbPool.query(query, error => {

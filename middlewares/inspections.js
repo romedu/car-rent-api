@@ -32,6 +32,8 @@ exports.checkIfIsRenter = (req, res, next) => {
 };
 
 // Check if the vehicle is currently rented
+// Even though the rented vehicle is suppossed to be inspected before returning it and the next middleware will stop the request,
+// this one saves the need to make an extra query :D
 exports.checkIfRented = (req, res, next) => {
 	const { currentRent } = req.locals;
 
@@ -49,7 +51,7 @@ exports.checkIfNotInspected = (req, res, next) => {
 
 	dbPool.query(rentCountQuery, (error, rentCountResult) => {
 		if (error) return next(error);
-		const { rentCount } = JSON.parse(JSON.stringify(rentCountResult));
+		const { rentCount } = JSON.parse(JSON.stringify(rentCountResult))[0];
 		// If the count is greater than 0 it was inspected already
 		if (!rentCount) return next();
 		else {
