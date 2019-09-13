@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs"),
 	jwt = require("jsonwebtoken"),
 	dbPool = require("../model"),
+	{ createError } = require("../utils"),
 	{ SECRET } = process.env;
 
 exports.login = (req, res, next) => {
@@ -25,7 +26,7 @@ exports.login = (req, res, next) => {
 				}
 			}
 
-			throw new Error("Invalid Username/Password");
+			throw createError(422, "Invalid Username/Password");
 		} catch (error) {
 			next(error);
 		}

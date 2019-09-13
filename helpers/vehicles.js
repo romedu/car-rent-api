@@ -1,5 +1,5 @@
 const dbPool = require("../model"),
-	{ convertToWhereClause } = require("../utils");
+	{ convertToWhereClause, createError } = require("../utils");
 
 exports.findAll = (req, res, next) => {
 	const { page = 1, ...queryParams } = req.query,
@@ -50,7 +50,7 @@ exports.findOne = (req, res, next) => {
 		const vehicle = JSON.parse(JSON.stringify(results))[0];
 		// If no vehicle matches the id passed in the params, throw a not found error
 		if (!vehicle) {
-			error = new Error("Not Found");
+			error = createError(404);
 			return next(error);
 		}
 		res.status(200).json({ vehicle });

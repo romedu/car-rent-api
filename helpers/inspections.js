@@ -1,5 +1,5 @@
 const dbPool = require("../model"),
-	{ convertToWhereClause } = require("../utils");
+	{ convertToWhereClause, createError } = require("../utils");
 
 exports.findAll = (req, res, next) => {
 	const { page = 1, ...queryParams } = req.query,
@@ -74,7 +74,7 @@ exports.findOne = (req, res, next) => {
 		const inspection = JSON.parse(JSON.stringify(results))[0];
 		// If no inspection matches the id passed in the params, throw a not found error
 		if (!inspection) {
-			error = new Error("Not Found");
+			error = createError(404);
 			return next(error);
 		}
 		return res.status(200).json({ inspection });

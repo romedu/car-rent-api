@@ -1,4 +1,5 @@
-const dbPool = require("../model");
+const dbPool = require("../model"),
+	{ createError } = require("../utils");
 
 // Finds the current rent based on the req.body's rentId property
 exports.getCurrentRent = (req, res, next) => {
@@ -13,7 +14,7 @@ exports.getCurrentRent = (req, res, next) => {
 		const rentData = JSON.parse(JSON.stringify(rentResult))[0];
 		// If no rent was found with the passed id send an error
 		if (!rentData) {
-			error = new Error("Rent not found");
+			error = createError(404);
 			return next(error);
 		}
 		req.locals.currentRent = { ...rentData };
@@ -26,7 +27,7 @@ exports.checkIfIsRenter = (req, res, next) => {
 	const { currentRent, currentUserId } = req.locals;
 	if (currentRent.renterId === currentUserId) return next();
 	else {
-		const error = new Error("Unauthorized");
+		const error = createError(401);
 		return next(error);
 	}
 };
@@ -39,7 +40,7 @@ exports.checkIfRented = (req, res, next) => {
 
 	// If the rent was already returned send an error
 	if (currentRent.returnedAt) {
-		const error = new Error("Rent was already returned");
+		const error = createError(400, "Rent was already returned");
 		return next(error);
 	}
 	return next();
@@ -55,7 +56,7 @@ exports.checkIfNotInspected = (req, res, next) => {
 		// If the count is greater than 0 it was inspected already
 		if (!rentCount) return next();
 		else {
-			error = new Error("Vehicle was inspected already");
+			error = createError(400, "Vehicle was inspected already");
 			return next(error);
 		}
 	});

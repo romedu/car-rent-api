@@ -1,4 +1,5 @@
-const dbPool = require("../model");
+const dbPool = require("../model"),
+	{ createError } = require("../utils");
 
 // Checks if the currentUser is the one who actually rented the car
 exports.checkIfOwner = (req, res, next) => {
@@ -12,13 +13,13 @@ exports.checkIfOwner = (req, res, next) => {
 
 		// If no rent were found throw a not found error
 		if (!rentData) {
-			error = new Error("Not found");
+			error = createError(404);
 			return next(error);
 		}
 
 		if (rentData.clientId === currentUserId) next();
 		else {
-			error = new Error("Unauthorized");
+			error = createError(401);
 			return next(error);
 		}
 	});
@@ -34,7 +35,7 @@ exports.getCurrentVehicle = (req, res, next) => {
 		const vehicleData = JSON.parse(JSON.stringify(result))[0];
 		// If no vehicle was found with the passed id send an error
 		if (!vehicleData) {
-			error = new Error("Vehicle not found");
+			error = createError(404);
 			return next(error);
 		}
 		req.locals.currentVehicle = { ...vehicleData };
@@ -66,7 +67,7 @@ exports.checkVehicleAvailability = (req, res, next) => {
 	const { available } = req.locals.currentVehicle;
 	if (available) return next();
 	else {
-		const error = new Error("Vehicle is currently unavailable");
+		const error = createError(400, "Vehicle is currently unavailable");
 		return next(error);
 	}
 };
@@ -76,7 +77,7 @@ exports.checkVehicleUnavailability = (req, res, next) => {
 	const { available } = req.locals.currentVehicle;
 	if (!available) return next();
 	else {
-		const error = new Error("Vehicle must be rented first");
+		const error = createError(400, "Vehicle must be rented first");
 		return next(error);
 	}
 };
@@ -91,7 +92,7 @@ exports.checkIfInspected = (req, res, next) => {
 		const { rentCount } = JSON.parse(JSON.stringify(countResult))[0];
 		if (rentCount) return next();
 		else {
-			error = new Error("Vehicle must be inspected first");
+			error = createError(400, "Vehicle must be inspected first");
 			return next(error);
 		}
 	});
