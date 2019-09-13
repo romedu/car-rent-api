@@ -10,13 +10,22 @@ exports.login = (req, res, next) => {
 	dbPool.query(userQuery, async (error, results) => {
 		try {
 			if (error) throw error;
-			const { password: hashedPassword, id: userId } = JSON.parse(
-					JSON.stringify(results)
-				)[0],
-				passwordValidity = await bcrypt.compare(password, hashedPassword);
+			const userData = JSON.parse(JSON.stringify(results))[0];
 
-			if (!passwordValidity) throw new Error("Invalid Username/Password");
-			return res.status(200).json({ token: await getValidJwt(userId) });
+			if (userData) {
+				const { password: hashedPassword, id: userId } = userData,
+					passwordValidity = await bcrypt.compare(
+						password,
+						hashedPassword
+					);
+
+				if (passwordValidity) {
+					const token = await getValidJwt(userId);
+					return res.status(200).json({ token });
+				}
+			}
+
+			throw new Error("Invalid Username/Password");
 		} catch (error) {
 			next(error);
 		}
