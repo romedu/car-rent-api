@@ -51,14 +51,30 @@ exports.register = async (req, res, next) => {
 
 		dbPool.query(query, async (error, result) => {
 			if (error) return next(error);
-			const { insertId: userId } = JSON.parse(JSON.stringify(result));
-			return res.status(201).json({ token: await getValidJwt(userId) });
+			const { insertId: userId } = JSON.parse(JSON.stringify(result)),
+				token = await getValidJwt(userId);
+
+			return res.status(201).json({ token });
 		});
 	} catch (error) {
 		return next(error);
 	}
 };
 
-const getValidJwt = async userId => await jwt.sign({ userId }, SECRET);
+exports.renewToken = async (req, res, next) => {
+	const { currentUserId } = req.locals,
+		token = await getValidJwt(currentUserId);
+
+	return res.status(201).json({ token });
+};
+
+// The expiresIn param accepts the number of seconds in which the token will expire, defaulting at 2 hours
+const getValidJwt = async (userId, expiresIn = 60 * 120) => {
+	// The token will expire 2 hours after its creation
+	const token = await jwt.sign({ userId }, SECRET, { expiresIn }),
+		tokenExp = new Date().valueOf() + 1000 * expiresIn; // Represents in milliseconds the time when the token will expire
+
+	return { token, tokenExp };
+};
 
 module.exports = exports;
