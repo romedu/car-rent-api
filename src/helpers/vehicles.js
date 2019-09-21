@@ -24,8 +24,13 @@ exports.findAll = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		const vehicles = JSON.parse(JSON.stringify(results));
-		return res.status(200).json({ vehicles });
+		const vehicles = JSON.parse(JSON.stringify(results)); // Convert from array-like-object to array
+			  responseData = {
+				  page,
+				  data: vehicles
+			  };
+			  
+		return res.status(200).json(responseData);ehicles });
 	});
 };
 
@@ -47,7 +52,7 @@ exports.findOne = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		const vehicle = JSON.parse(JSON.stringify(results))[0];
+		const vehicle = JSON.parse(JSON.stringify(results))[0]; // Convert from array-like-object to array, and take the first and "only" result
 		// If no vehicle matches the id passed in the params, throw a not found error
 		if (!vehicle) {
 			error = createError(404);

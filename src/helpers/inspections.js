@@ -28,8 +28,13 @@ exports.findAll = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		const inspections = JSON.parse(JSON.stringify(results));
-		return res.status(200).json({ inspections });
+		const inspections = JSON.parse(JSON.stringify(results)), // Convert from array-like-object to array
+			  responseData = {
+				  page,
+				  data: inspections
+			  };
+			  
+		return res.status(200).json(responseData);
 	});
 };
 
@@ -71,7 +76,7 @@ exports.findOne = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		const inspection = JSON.parse(JSON.stringify(results))[0];
+		const inspection = JSON.parse(JSON.stringify(results))[0]; // Convert from array-like-object to array, and take the first and "only" result
 		// If no inspection matches the id passed in the params, throw a not found error
 		if (!inspection) {
 			error = createError(404);
