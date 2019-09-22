@@ -8,8 +8,9 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-               SELECT inspection.id AS id, inspection.created_at AS createdAt, vehicle.built_year AS builtYear, 
-                      vehicle_image.front_image AS frontImage, model.description AS model, make.description AS make 
+               SELECT inspection.id AS id, DATE_FORMAT(inspection.inspected_at, '%e/%m/%Y %l:%i %p') AS inspectedAt, 
+                      vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, model.description AS model, 
+                      make.description AS make, employee.name AS inspectedBy
                FROM inspection
                INNER JOIN rent
                ON inspection.rent_id = rent.id
@@ -17,6 +18,8 @@ exports.findAll = (req, res, next) => {
                ON rent.vehicle_id = vehicle.id
                INNER JOIN vehicle_image
                ON vehicle_image.vehicle_id = vehicle.id
+               INNER JOIN employee
+               ON employee.id = inspection.employee_id
                INNER JOIN model
                ON model.id = vehicle.model_id
                INNER JOIN make
@@ -29,11 +32,11 @@ exports.findAll = (req, res, next) => {
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
 		const inspections = JSON.parse(JSON.stringify(results)), // Convert from array-like-object to array
-			  responseData = {
-				  page,
-				  data: inspections
-			  };
-			  
+			responseData = {
+				page,
+				data: inspections
+			};
+
 		return res.status(200).json(responseData);
 	});
 };

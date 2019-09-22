@@ -8,8 +8,9 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-         SELECT rent.*, vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, 
-                  model.description AS model, make.description AS make 
+         SELECT rent.id, DATE_FORMAT(rent.rented_at, '%e/%m/%Y %l:%i %p') AS rentedAt, rent.rent_days AS rentDays, 
+                vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, model.description AS model, 
+                make.description AS make 
          FROM rent
          INNER JOIN vehicle
          ON rent.vehicle_id = vehicle.id

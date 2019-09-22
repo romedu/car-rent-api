@@ -8,15 +8,20 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-				SELECT vehicle.*, vehicle_image.front_image AS frontImage, model.description AS model, 
-                    make.description AS make 
+            SELECT vehicle.id, vehicle.rent_price AS rentPrice, vehicle_image.front_image AS frontImage, 
+                   model.description AS model, make.description AS make, body_style.description AS bodyStyle,
+                   fuel.description AS fuel
             FROM vehicle
             INNER JOIN vehicle_image
-				ON vehicle_image.vehicle_id = vehicle.id
+            ON vehicle_image.vehicle_id = vehicle.id
+            INNER JOIN body_style
+            ON body_style.id = vehicle.body_style_id
+            INNER JOIN fuel
+            ON fuel.id = vehicle.fuel_id
 				INNER JOIN model
             ON model.id = vehicle.model_id
             INNER JOIN make
-		      ON make.id = model.make_id
+            ON make.id = model.make_id
             ${whereClause}
             ORDER BY vehicle.rents
             LIMIT ${page * 10 - 10}, ${page * 10};
