@@ -26,7 +26,8 @@ exports.findAll = (req, res, next) => {
                ON make.id = model.make_id
                ${whereClause}
                ORDER BY vehicle.rents
-               LIMIT ${page * 10}, ${page * 10 - 9};
+               LIMIT 10
+               OFFSET ${page * 10 - 10};
             `;
 
 	dbPool.query(query, (error, results) => {
