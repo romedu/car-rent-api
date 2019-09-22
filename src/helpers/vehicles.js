@@ -8,7 +8,7 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-            SELECT vehicle.id, vehicle.rent_price AS rentPrice, vehicle_image.front_image AS frontImage, 
+            SELECT vehicle.id, vehicle.builtYear, vehicle.rent_price AS rentPrice, vehicle_image.front_image AS frontImage, 
                    model.description AS model, make.description AS make, body_style.description AS bodyStyle,
                    fuel.description AS fuel
             FROM vehicle
