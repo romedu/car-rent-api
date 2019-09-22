@@ -27,12 +27,12 @@ exports.findAll = (req, res, next) => {
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
 		const rents = JSON.parse(JSON.stringify(results)), // Convert from array-like-object to array
-			  responseData = {
-				  page,
-				  data: rents
-			  };
-			  
-		return res.status(200).json(rents);
+			responseData = {
+				page,
+				data: rents
+			};
+
+		return res.status(200).json(responseData);
 	});
 };
 

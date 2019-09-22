@@ -24,13 +24,13 @@ exports.findAll = (req, res, next) => {
 
 	dbPool.query(query, (error, results) => {
 		if (error) return next(error);
-		const vehicles = JSON.parse(JSON.stringify(results)); // Convert from array-like-object to array
-			  responseData = {
-				  page,
-				  data: vehicles
-			  };
-			  
-		return res.status(200).json(responseData);ehicles });
+		const vehicles = JSON.parse(JSON.stringify(results)), // Convert from array-like-object to array
+			responseData = {
+				page,
+				data: vehicles
+			};
+
+		return res.status(200).json(responseData);
 	});
 };
 
