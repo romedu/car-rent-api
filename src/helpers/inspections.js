@@ -8,7 +8,7 @@ exports.findAll = (req, res, next) => {
 			? `WHERE ${convertToWhereClause(queryParams)}`
 			: "",
 		query = `
-               SELECT inspection.id AS id, DATE_FORMAT(inspection.inspected_at, '%e/%m/%Y %l:%i %p') AS inspectedAt, 
+               SELECT inspection.id AS id, DATE_FORMAT(inspection.inspected_at, '%e/%m/%Y') AS inspectedAt, 
                       vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, model.description AS model, 
                       make.description AS make, employee.name AS inspectedBy
                FROM inspection
