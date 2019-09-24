@@ -74,7 +74,7 @@ const getValidJwt = async (userId, expiresIn = 60 * 120) => {
 	const token = await jwt.sign({ userId }, SECRET, { expiresIn }),
 		tokenExp = new Date().valueOf() + 1000 * expiresIn; // Represents in milliseconds the time when the token will expire
 
-	return { token, tokenExp };
+	return { userId, token, tokenExp };
 };
 
 module.exports = exports;
