@@ -6,7 +6,10 @@ exports.convertToWhereClause = queryParams => {
 			const [property, value] = nextVal;
 			// After the first property, the AND delimiter is added prior to every other
 			acc +=
-				index > 1 ? ` AND ${property}=${value}` : `${property}="${value}"`;
+				index > 0
+					? ` AND ${property}="${value}"`
+					: `${property}="${value}"`;
+
 			return acc;
 		}, "");
 
