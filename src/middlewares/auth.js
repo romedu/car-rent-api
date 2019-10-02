@@ -4,9 +4,9 @@ const validators = require("../validators"),
 exports.validateLoginBody = (req, res, next) => {
 	const propertyValidators = {
 			username: stringToValidate =>
-				validators.validateStringLength(stringToValidate, 8),
+				validators.checkIfValidString(stringToValidate),
 			password: stringToValidate =>
-				validators.validateStringLength(stringToValidate, 8)
+				validators.checkIfValidString(stringToValidate)
 		},
 		invalidFields = exports.validateBody(req.body, propertyValidators);
 
