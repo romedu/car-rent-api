@@ -1,10 +1,11 @@
 const router = require("express").Router(),
 	authHelpers = require("../helpers/auth"),
-	{ checkIfToken } = require("../middlewares");
+	{ checkIfToken } = require("../middlewares"),
+	{ validateLoginBody, validateRegisterBody } = require("../middlewares/auth");
 
-router.post("/login", authHelpers.login);
+router.post("/login", validateLoginBody, authHelpers.login);
 
-router.post("/register", authHelpers.register);
+router.post("/register", validateRegisterBody, authHelpers.register);
 
 router.get("/renew-token", checkIfToken, authHelpers.renewToken);
 
