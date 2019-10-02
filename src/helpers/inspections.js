@@ -1,4 +1,5 @@
-const dbPool = require("../model"),
+const nodemailer = require("nodemailer"),
+	dbPool = require("../model"),
 	{ convertToWhereClause, createError } = require("../utils");
 
 exports.findAll = (req, res, next) => {
@@ -88,6 +89,76 @@ exports.findOne = (req, res, next) => {
 		}
 		return res.status(200).json({ inspection });
 	});
+};
+
+exports.sendMail = async (req, res, next) => {
+	try {
+		const { ...queryParams } = req.query,
+			//If there isn't any query params, omit the where clause
+			whereClause = Object.keys(queryParams).length
+				? `WHERE ${convertToWhereClause(queryParams)}`
+				: "",
+			query = `
+               SELECT inspection.id AS id, DATE_FORMAT(inspection.inspected_at, '%e/%m/%Y') AS inspectedAt, 
+                      vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, model.description AS model, 
+                      make.description AS make, employee.name AS inspectedBy
+               FROM inspection
+               INNER JOIN rent
+               ON inspection.rent_id = rent.id
+               INNER JOIN vehicle
+               ON rent.vehicle_id = vehicle.id
+               INNER JOIN vehicle_image
+               ON vehicle_image.vehicle_id = vehicle.id
+               INNER JOIN employee
+               ON employee.id = inspection.employee_id
+               INNER JOIN model
+               ON model.id = vehicle.model_id
+               INNER JOIN make
+               ON make.id = model.make_id
+               ${whereClause}
+               ORDER BY vehicle.rents
+            `;
+
+		dbPool.query(query, async (error, results) => {
+			if (error) return next(error);
+			const inspections = JSON.parse(JSON.stringify(results)), // Convert from array-like-object to array
+				{ EMAIL_HOST, EMAIL_PASSWORD } = process.env,
+				transporter = nodemailer.createTransport({
+					host: "Smtp.live.com",
+					service: "Outlook",
+					port: 587,
+					secure: false,
+					tls: {
+						rejectUnauthorized: false
+					},
+					auth: {
+						user: EMAIL_HOST,
+						pass: EMAIL_PASSWORD
+					}
+				});
+
+			try {
+				const { email: emailReceiver } = req.body,
+					mailOptions = {
+						from: `"Rent-Car-App👻" ${EMAIL_HOST}`,
+						to: emailReceiver,
+						subject: `Inspections Report`,
+						text: inspections.map(obj => JSON.stringify(obj)).join("\n\n")
+					};
+
+				if (!emailReceiver) throw createError(400, "Invalid email address");
+				else await transporter.sendMail(mailOptions);
+
+				return res
+					.status(200)
+					.json({ message: "The report was sent to your email" });
+			} catch (error) {
+				return next(error);
+			}
+		});
+	} catch (error) {
+		return next(error);
+	}
 };
 
 module.exports = exports;

@@ -30,4 +30,6 @@ router.patch(
 	rentsHelpers.returnRent
 );
 
+router.post("/send-report", rentsHelpers.sendMail);
+
 module.exports = router;

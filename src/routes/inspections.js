@@ -20,4 +20,6 @@ router.post(
 
 router.get("/:id", inspectionsHelpers.findOne);
 
+router.post("/send-report", inspectionsHelpers.sendMail);
+
 module.exports = router;
