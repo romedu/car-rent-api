@@ -43,8 +43,9 @@ exports.findAll = (req, res, next) => {
 
 exports.findOne = (req, res, next) => {
 	const query = `
-		SELECT vehicle.*, vehicle_image.front_image AS frontImage, model.description AS model, 
-             make.description AS make, body_style.description AS bodyStyle 
+      SELECT vehicle.chassisNo, vehicle.engineNo, vehicle.plateNo, vehicle.rents, vehicle.available, 
+             vehicle.description AS color, vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, 
+             model.description AS model, make.description AS make, body_style.description AS bodyStyle, fuel.description AS fuel
       FROM vehicle
 		INNER JOIN vehicle_image
 		ON vehicle_image.vehicle_id = vehicle.id
@@ -54,6 +55,8 @@ exports.findOne = (req, res, next) => {
 		ON make.id = model.make_id
       INNER JOIN body_style
       ON body_style.id = vehicle.body_style_id
+      INNER JOIN fuel
+      ON fuel.id = vehicle.fuel_id
 		WHERE vehicle.id = "${req.params.id}";
 	`;
 

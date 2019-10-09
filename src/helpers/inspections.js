@@ -61,7 +61,9 @@ exports.create = (req, res, next) => {
 exports.findOne = (req, res, next) => {
 	const { id: inspectionId } = req.params,
 		query = `
-         SELECT inspection.*, employee.name AS employeeName, vehicle.built_year AS builtYear, 
+         SELECT inspection.id, inspection.zest, inspection.fuel_amount AS fuelAmount, inspection.replacement_wheel AS replacementWheel, 
+                inspection.hydraulic_jack AS hydraulicJack, inspection.glass_breakage AS glassBreakage, inspection.pass_wheels_check AS passWheelsCheck, 
+                inspection.inspected_at AS inspectedAt, inspection.available, inspection.rent_id AS rentId, employee.name AS employeeName, vehicle.built_year AS builtYear, 
                 vehicle_image.front_image AS frontImage, model.description AS model, make.description AS make 
          FROM inspection
          INNER JOIN rent
