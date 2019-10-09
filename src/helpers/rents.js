@@ -78,9 +78,10 @@ exports.create = (req, res, next) => {
 exports.findOne = (req, res, next) => {
 	const { id: rentId } = req.params,
 		query = `
-         SELECT rent.id, rent.rented_at AS rentedAt, rent.returned_at AS returnedAt, rent.rent_days AS rentDays, rent.commentary,
-                rent.fee, rent.available, rent.vehicle_id AS vehicleId, vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage,
-                model.description AS model, make.description AS make, client.name AS clientName, employee.name as employee
+         SELECT rent.id, DATE_FORMAT(rent.rented_at, '%e/%m/%Y') AS rentedAt, DATE_FORMAT(rent.returned_at, '%e/%m/%Y') AS returnedAt, 
+                rent.rent_days AS rentDays, rent.commentary, rent.fee, rent.available, rent.vehicle_id AS vehicleId, 
+                vehicle.built_year AS builtYear, vehicle_image.front_image AS frontImage, model.description AS model, 
+                make.description AS make, client.name AS clientName, employee.name as employee
          FROM rent
          INNER JOIN vehicle
          ON rent.vehicle_id = vehicle.id
